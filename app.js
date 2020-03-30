@@ -2,10 +2,10 @@
 // VERMELHO: #ff704d
 // CINZA:  #d9d9d9
 
-colorSystem = {green:"#b4f7b0",red:"#ff704d", grey:"#d9d9d9", black:"#590000"}
+colorSystem = {green:"#b4f7b0",red:"#ff704d", grey:"#d9d9d9", black:"#c20000"}
 
 function setup() {
-  createCanvas(720, 400);
+  createCanvas(720, 720);
 
   arraySystem = [];
 
@@ -66,6 +66,11 @@ class Particle{
       })
     }
 
+    cantMove(){
+      this.velocity.x = 0;
+      this.velocity.y = 0;
+    }
+
     isImmune(){
       this.color = colorSystem.green;
       this.infected = false;
@@ -74,9 +79,8 @@ class Particle{
       
     isDead(){
       this.color = colorSystem.black;
-      this.alive = false
-      this.velocity.x = 0;
-      this.velocity.y = 0;
+      this.alive = false;
+      this.cantMove();
     }
 
     display(){
@@ -120,12 +124,10 @@ class Particle{
           }
 
           if(this.alive === false){
-            this.velocity.x = 0;
-            this.velocity.y = 0;
+            this.cantMove();
           }
           if(arraySystem[i].alive === false){
-            arraySystem[i].velocity.x = 0;
-            arraySystem[i].velocity.y = 0;
+            arraySystem[i].cantMove();
           }
         }
       }

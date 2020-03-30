@@ -2,7 +2,7 @@
 // VERMELHO: #ff704d
 // CINZA:  #d9d9d9
 
-colorSystem = {blue:"#b4f7b0",red:"#ff704d", grey:"#d9d9d9"}
+colorSystem = {green:"#b4f7b0",red:"#ff704d", grey:"#d9d9d9", black:"#590000"}
 
 function setup() {
   createCanvas(720, 400);
@@ -10,7 +10,7 @@ function setup() {
   arraySystem = [];
 
   particleSystem = new particleSystem(500);
-  //colorSystem = {blue:"#b3f0ff",red:"#ff704d", grey:"#d9d9d9"}
+  //colorSystem = {green:"#b3f0ff",red:"#ff704d", grey:"#d9d9d9"}
 }
 
 function draw() {
@@ -28,10 +28,11 @@ class Particle{
         this.diameter = diameter
         this.color = colorSystem.grey;
         this.infected = false;
-        this.immune = false
+        this.immune = false;
+        this.alive = true;
 
-        this.minhaPromisse = () => new Promise((resolve,reject)=>{
-          setTimeout(()=> this.isImmune(),20000)
+        this.myPromisse = () => new Promise((resolve,reject)=>{
+          setTimeout(()=> this.chose(),20000)
         })
 
     }
@@ -43,26 +44,41 @@ class Particle{
       
       // Method to update position
     update(){
-        this.velocity.add(this.acceleration);
-        this.position.add(this.velocity);
+      this.velocity.add(this.acceleration);
+      this.position.add(this.velocity);
     };
 
+    chose(){
+      if(Math.random() > 0.10){
+        this.isImmune();
+      }
+      else{
+        this.isDead();
+      }
+    }
+    
     isInfected(){
       this.color = colorSystem.red;
       this.infected = true;
 
-      this.minhaPromisse().then(response =>{
+      this.myPromisse().then(response =>{
         //console.log(response);
       })
     }
 
     isImmune(){
-      this.color = colorSystem.blue;
+      this.color = colorSystem.green;
       this.infected = false;
       this.immune = true
     }
       
-      // Method to display
+    isDead(){
+      this.color = colorSystem.black;
+      this.alive = false
+      this.velocity.x = 0;
+      this.velocity.y = 0;
+    }
+
     display(){
         //stroke(255, 255);
         strokeWeight(0);
@@ -72,10 +88,10 @@ class Particle{
 
     checkColision(){
       if(this.position.x <= 0 + this.diameter/2 || this.position.x >= width - this.diameter/2){
-        this.velocity.x *= -0.95
+        this.velocity.x *= -1;
       }
       if(this.position.y <= 0 + this.diameter/2 || this.position.y >= height  - this.diameter/2){
-        this.velocity.y *= -0.95
+        this.velocity.y *= -1;
       }
 
       for(let i = this.id+1; i < arraySystem.length; i++){
@@ -88,8 +104,8 @@ class Particle{
           let angle = atan2(dy, dx);
           let targetX = this.position.x + cos(angle) * minDist;
           let targetY = this.position.y + sin(angle) * minDist;
-          let ax = (targetX - arraySystem[i].position.x) * 0.1;
-          let ay = (targetY - arraySystem[i].position.y) * 0.1;
+          let ax = (targetX - arraySystem[i].position.x) * 0.05;
+          let ay = (targetY - arraySystem[i].position.y) * 0.05;
           this.velocity.x -= ax;
           this.velocity.y -= ay;
           arraySystem[i].velocity.x += ax;
@@ -101,6 +117,15 @@ class Particle{
           }
           if(this.infected === true && arraySystem[i].infected === false && arraySystem[i].immune === false){
             arraySystem[i].isInfected()
+          }
+
+          if(this.alive === false){
+            this.velocity.x = 0;
+            this.velocity.y = 0;
+          }
+          if(arraySystem[i].alive === false){
+            arraySystem[i].velocity.x = 0;
+            arraySystem[i].velocity.y = 0;
           }
         }
       }
